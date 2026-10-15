@@ -4514,7 +4514,10 @@ void BotEngine::MainLoop() {
         // If no monsters are seen for 20 continuous seconds, pause hunting.
         // As soon as monsters reappear on screen, immediately resume hunting!
         // ====================================================================
-        if (lastVisibleMonsterPixels >= 40) {
+        if (selectedHotspot.load() == 2 || selectedHotspot.load() == 3) {
+            // Full Desert Trail & Corridor continuous sweeps: keep moving continuously along the trail!
+            lastMonsterSeenTick = GetTickCount64();
+        } else if (lastVisibleMonsterPixels >= 40) {
             lastMonsterSeenTick = GetTickCount64();
         } else {
             ULONGLONG noMonsterElapsed = GetTickCount64() - lastMonsterSeenTick;
@@ -4735,6 +4738,7 @@ void BotEngine::MainLoop() {
         const MapWaypoint* activeCircuit = nullptr;
         int totalCircuitWp = 0;
         GetActiveCircuitForHotspot(selectedHotspot.load(), activeCircuit, totalCircuitWp);
+        if (!activeCircuit || totalCircuitWp <= 0) continue;
 
         const MapWaypoint& targetWp = activeCircuit[currentWaypointIndex % totalCircuitWp];
         const MapWaypoint& prevWp = activeCircuit[(currentWaypointIndex + totalCircuitWp - 1) % totalCircuitWp];
@@ -4745,25 +4749,30 @@ void BotEngine::MainLoop() {
         const double maxJumpY = 340.0;
         const double minJumpDist = 220.0;
 
+        static int jumpsAtWp = 0;
+
         if (hasCoords && curX > 0 && curY > 0) {
             int dMapX = targetWp.x - curX;
             int dMapY = targetWp.y - curY;
             double distMap = std::hypot(dMapX, dMapY);
 
             // Progressive pack sweeping & waypoint advancement:
+            // For Spot 3 (Full Desert Trail) & Spot 4 (Corridor):
+            // If within 7.5 tiles OR already jumped 2 times towards this waypoint -> advance!
             bool waypointReached = false;
             if (selectedHotspot.load() == 3 || selectedHotspot.load() == 2) {
-                if (distMap <= 6.5) {
+                if (distMap <= 7.5 || jumpsAtWp >= 2) {
                     waypointReached = true;
                 }
             } else {
-                if (distMap <= 6.0) {
+                if (distMap <= 6.5 || jumpsAtWp >= 3) {
                     waypointReached = true;
                 }
             }
 
             if (waypointReached) {
                 currentWaypointIndex = (currentWaypointIndex + 1) % totalCircuitWp;
+                jumpsAtWp = 0;
                 continue;
             }
 
@@ -4783,13 +4792,31 @@ void BotEngine::MainLoop() {
 
             double screenDist = std::hypot(screenDx, screenDy);
 
-            if (screenDist < minJumpDist && screenDist > 1.0) {
-                // Enforce normal full jump distance away from player so jump clicks NEVER land on player feet or nearby ground drops
+            if (screenDist > maxJumpX) {
+                double nx = screenDx / screenDist;
+                double ny = screenDy / screenDist;
+                screenDx = nx * maxJumpX;
+                screenDy = ny * maxJumpY;
+            } else if (screenDist < minJumpDist && screenDist > 1.0) {
                 double nx = screenDx / screenDist;
                 double ny = screenDy / screenDist;
                 screenDx = nx * minJumpDist;
                 screenDy = ny * (minJumpDist * 0.7);
-            } else if (screenDist > maxJumpX) {
+            }
+
+            clickX = centerX + (int)std::round(screenDx);
+            clickY = centerY + (int)std::round(screenDy);
+            jumpsAtWp++;
+        } else {
+            // Directional circuit waypoint navigation (AutoHunt_v2 continuous sweep)
+            // Guarantees nonstop sweeping across the entire map even when HUD OCR / title coords are unavailable!
+            int dMapX = targetWp.x - prevWp.x;
+            int dMapY = targetWp.y - prevWp.y;
+            double screenDx = (dMapX - dMapY) * 26.0;
+            double screenDy = (dMapX + dMapY) * 13.0;
+            double screenDist = std::hypot(screenDx, screenDy);
+
+            if (screenDist > 0.1) {
                 double nx = screenDx / screenDist;
                 double ny = screenDy / screenDist;
                 screenDx = nx * maxJumpX;
@@ -4798,22 +4825,13 @@ void BotEngine::MainLoop() {
 
             clickX = centerX + (int)std::round(screenDx);
             clickY = centerY + (int)std::round(screenDy);
-        } else {
-            // Balanced Closed-Loop Patrol Jumps with normal jump distance (>= 210-234px)
-            static const struct BalancedJump { int dx; int dy; } BALANCED_DESERT_JUMPS[8] = {
-                {  220,  -80 }, // Step 0: North-East sweep (234px)
-                {  220,   80 }, // Step 1: East-South-East (234px)
-                { -160,  150 }, // Step 2: South return (219px)
-                { -220,   60 }, // Step 3: South-West sweep (228px)
-                { -220,  -80 }, // Step 4: North-West sweep (234px)
-                { -160, -150 }, // Step 5: North sweep (219px)
-                {  180, -110 }, // Step 6: North-East return (211px)
-                {  180,  110 }  // Step 7: Center balance (211px)
-            };
-            const auto& bj = BALANCED_DESERT_JUMPS[currentWaypointIndex % 8];
-            clickX = centerX + bj.dx;
-            clickY = centerY + bj.dy;
-            currentWaypointIndex = (currentWaypointIndex + 1) % 8;
+
+            jumpsAtWp++;
+            // Exactly 2 jumps ("دبل نطة") covers the ~28 tiles between consecutive waypoints!
+            if (jumpsAtWp >= 2) {
+                currentWaypointIndex = (currentWaypointIndex + 1) % totalCircuitWp;
+                jumpsAtWp = 0;
+            }
         }
 
         // Clamp within game window bounds
@@ -4823,21 +4841,20 @@ void BotEngine::MainLoop() {
         POINT ptJump = { clickX, clickY };
         ClientToScreen(gameHwnd, &ptJump);
 
-        // 1. Jump Click (Immediate crisp takeoff via 100% Interception)
+        // 1. Jump Click (Instant takeoff via Interception)
         Input::JumpClick(ptJump.x, ptJump.y);
 
-        // 2. Mid-air Scatter Shot 1 (fired 22ms after takeoff while airborne)
-        if (!SafeSleep(22)) break;
-        Input::AttackRightClick(ptJump.x, ptJump.y);
+        // 2. Flight airtime (220ms - matches natural Conquer Online jump arc)
+        if (!SafeSleep(220)) break;
 
-        // 3. Mid-air Scatter Shot 2 (sweep +35px across pack fired 20ms later)
-        if (!SafeSleep(20)) break;
+        // 3. Ultra-fast mid-air / landing scatter attacks (AutoHunt_v2 style)
+        Input::AttackRightClick(ptJump.x, ptJump.y);
+        if (!SafeSleep(35)) break;
+
         POINT ptShot2 = { ptJump.x + 35, ptJump.y };
         Input::AttackRightClick(ptShot2.x, ptShot2.y);
+        if (!SafeSleep(30)) break;
 
-        // 4. Landing synchronization (85ms remaining airtime: 22 + 20 + 85 = 127ms total jump)
-        // Next jump chains seamlessly on landing with 0ms ground pause! ("لازقة في ديل النطة")
-        if (!SafeSleep(85)) break;
         // Clear screen-coordinate vision blacklist on new jump destination
         visionBlacklist.clear();
     }

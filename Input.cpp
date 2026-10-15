@@ -354,23 +354,17 @@ void Input::SendCtrlW() {
     }
 }
 
-// Ultra-Fast Hardware Jump Click: Re-assert Ctrl, crisp doubled left-click for guaranteed takeoff
+// Ultra-Fast Hardware Jump Click: Re-assert Ctrl, crisp single Left Click for instant takeoff
 void Input::JumpClick(int targetX, int targetY, int holdMs) {
     MoveToInstant(targetX, targetY);
-    // Reinforce hardware Ctrl (DIK_LCONTROL 0x1D) before left-click to guarantee jump takeoff & prevent ground looting
-    KeyDown(0x1D);
+    KeyDown(0x1D); // DIK_LCONTROL
     s_isCtrlDown = true;
-    Sleep((DWORD)rnd(4.0, 8.0));
-    int ms = (holdMs <= 0 ? (int)rnd(20.0, 26.0) : holdMs);
-    // Crisp human-grade doubled left click (registers 100% in Conquer tick loop without bot detection)
+    Sleep(4);
+    int ms = (holdMs <= 0 ? 12 : holdMs);
     LeftDown();
     Sleep(ms);
     LeftUp();
-    Sleep((DWORD)rnd(10.0, 14.0));
-    LeftDown();
-    Sleep(ms);
-    LeftUp();
-    Sleep(2);
+    Sleep(4);
 }
 
 // Hardware Walk Click: ensures Ctrl is released, doubled Left Click to walk-pathfind
@@ -390,16 +384,10 @@ void Input::WalkClick(int targetX, int targetY, int holdMs) {
     Sleep(2);
 }
 
-// Ultra-Fast Hardware Scatter Attack (AutoHunt_v2 style): Doubled crisp Right Click via Interception
+// Ultra-Fast Hardware Scatter Attack (AutoHunt_v2 style): Crisp Right Click via Interception
 void Input::AttackRightClick(int targetX, int targetY, int holdMs) {
     MoveToInstant(targetX, targetY);
-    int ms = (holdMs <= 0 ? (int)rnd(16.0, 22.0) : holdMs);
-    // Click 1
-    RightDown();
-    Sleep(ms);
-    RightUp();
-    Sleep((DWORD)rnd(8.0, 14.0));
-    // Click 2 (Doubled attack)
+    int ms = (holdMs <= 0 ? 8 : holdMs);
     RightDown();
     Sleep(ms);
     RightUp();
