@@ -10,6 +10,7 @@
 #include "Input.h"
 #include "Projection.h"
 #include "LootFilter.h"
+#include "HotbarAutoUse.h"
 
 enum BotState {
     BOT_STATE_IDLE,
@@ -118,6 +119,14 @@ private:
     void PressF7Scatter();
     bool IsScatterEquipped();
     void WaitForLoginAndEquipScatter();
+
+    // Hotbar OCR Auto-Use: F4 Green Bag (starts strictly at 5 until 0) & F5 Yellow Chest (starts strictly at 1 until 0)
+    void CheckAndHandleHotbarItems();
+    std::atomic<bool> isUsingGreenBag{ false };
+    std::atomic<bool> isUsingYellowChest{ false };
+    ULONGLONG lastHotbarCheckTick{ 0 };
+    ULONGLONG lastF4PressTick{ 0 };
+    ULONGLONG lastF5PressTick{ 0 };
 
     enum ObstacleType {
         OBSTACLE_NONE = 0,

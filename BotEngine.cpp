@@ -226,6 +226,8 @@ BotEngine::~BotEngine() {
 void BotEngine::Pause() {
     if (isRunning.load() && currentState.load() != BOT_STATE_PAUSED) {
         currentState = BOT_STATE_PAUSED;
+        isUsingGreenBag = false;
+        isUsingYellowChest = false;
         Input::HoldCtrl(false);
         Input::LeftUp();
         Input::RightUp();
@@ -2134,6 +2136,9 @@ void BotEngine::Stop() {
     bool wasRunning = isRunning.exchange(false);
     stopFlag = true;
 
+    isUsingGreenBag = false;
+    isUsingYellowChest = false;
+
     // Release all hardware driver inputs
     Input::HoldCtrl(false);
     Input::LeftUp();
@@ -2703,6 +2708,90 @@ bool BotEngine::CheckAndActivateSpeedSkill() {
         return true;
     }
     return false;
+}
+
+// ============================================================================
+// CheckAndHandleHotbarItems: 100% Hardware Driver Hotbar Auto-Use
+// Scans bottom hotbar via OCR:
+// - Slot 4 (F4 / Green Bag): When count reaches 5 ('5'), continuously presses F4 via
+//   100% Hardware Interception driver until count reaches 0. MUST NOT start if count < 5.
+// - Slot 5 (F5 / Yellow Chest): When count reaches 1 ('1'), continuously presses F5 via
+//   100% Hardware Interception driver until count reaches 0. MUST NOT start if count is 0.
+// - Runs seamlessly while hunting without interrupting jumping or scatter.
+// ============================================================================
+void BotEngine::CheckAndHandleHotbarItems() {
+    if (!gameHwnd || !IsWindow(gameHwnd)) return;
+
+    // Safety guard: only execute when game window is active foreground
+    if (GetForegroundWindow() != gameHwnd) {
+        return;
+    }
+
+    ULONGLONG now = GetTickCount64();
+    if (now - lastHotbarCheckTick < 70) {
+        return; // Throttle OCR check to every 70ms for ultra-low CPU and zero lag
+    }
+    lastHotbarCheckTick = now;
+
+    RECT rc;
+    GetClientRect(gameHwnd, &rc);
+    int winW = rc.right - rc.left;
+    int winH = rc.bottom - rc.top;
+    if (winW < 400 || winH < 300) return;
+
+    char digitF4 = '?';
+    char digitF5 = '?';
+    if (!HotbarAutoUse::ReadHotbarSlots(gameHwnd, winW, winH, digitF4, digitF5)) {
+        return;
+    }
+
+    // 1. Green Bag (Slot F4):
+    // Start strictly when count == 5. Once started, keep pressing F4 until count drops to 0.
+    if (!isUsingGreenBag.load()) {
+        if (digitF4 == '5') {
+            isUsingGreenBag = true;
+            std::cout << "\n========================================================================\n"
+                      << "  [+] 🎒 [Hotbar] Green Bag count reached 5! Starting F4 consumption...\n"
+                      << "========================================================================\n";
+        }
+    } else {
+        if (digitF4 == '0') {
+            isUsingGreenBag = false;
+            std::cout << "[+] 🎒 [Hotbar] Green Bag count reached 0 (empty). Stopped F4.\n";
+        }
+    }
+
+    if (isUsingGreenBag.load()) {
+        if (now - lastF4PressTick >= 70) {
+            // Send F4 strictly via 100% Hardware Interception driver (DIK_F4 = 0x3E)
+            Input::KeyPress(0x3E, 0.035);
+            lastF4PressTick = now;
+        }
+    }
+
+    // 2. Yellow Chest (Slot F5):
+    // Start strictly when count == 1. Once started, keep pressing F5 until count drops to 0.
+    if (!isUsingYellowChest.load()) {
+        if (digitF5 == '1') {
+            isUsingYellowChest = true;
+            std::cout << "\n========================================================================\n"
+                      << "  [+] 📦 [Hotbar] Yellow Chest count reached 1! Starting F5 consumption...\n"
+                      << "========================================================================\n";
+        }
+    } else {
+        if (digitF5 == '0') {
+            isUsingYellowChest = false;
+            std::cout << "[+] 📦 [Hotbar] Yellow Chest count reached 0 (empty). Stopped F5.\n";
+        }
+    }
+
+    if (isUsingYellowChest.load()) {
+        if (now - lastF5PressTick >= 70) {
+            // Send F5 strictly via 100% Hardware Interception driver (DIK_F5 = 0x3F)
+            Input::KeyPress(0x3F, 0.035);
+            lastF5PressTick = now;
+        }
+    }
 }
 
 // ============================================================================
@@ -4148,6 +4237,8 @@ void BotEngine::MainLoop() {
         // ====================================================================
         POINT ptYes = { 0, 0 };
         if (CheckSecurityDialog(ptYes)) {
+            isUsingGreenBag = false;
+            isUsingYellowChest = false;
             Input::HoldCtrl(false);
             Input::LeftUp();
             Input::RightUp();
@@ -4167,9 +4258,14 @@ void BotEngine::MainLoop() {
         // 0B. Speed Runner Skill Auto-Activation (الراجل الجاري from AutoHunt_v5)
         CheckAndActivateSpeedSkill();
 
+        // 0E. Hotbar OCR Auto-Use: F4 Green Bag (at 5 until 0) & F5 Yellow Chest (at 1 until 0)
+        CheckAndHandleHotbarItems();
+
         // Manual Pause / Resume toggle via [F8]
         if (GetAsyncKeyState(VK_F8) & 1) {
             currentState = BOT_STATE_PAUSED;
+            isUsingGreenBag = false;
+            isUsingYellowChest = false;
             Input::HoldCtrl(false);
             Input::LeftUp();
             Input::RightUp();
@@ -4734,6 +4830,7 @@ void BotEngine::MainLoop() {
 
             // 1. Jump Click (Instant takeoff)
             Input::JumpClick(ptJump.x, ptJump.y);
+            CheckAndHandleHotbarItems();
 
             // 2. 360° Scatter Attacks into surrounding monster packs
             // Rotate through 6 angles around character (North-East, South-East, South, South-West, North-West, North)
@@ -4883,6 +4980,7 @@ void BotEngine::MainLoop() {
 
         // 1. Jump Click (Instant takeoff via Interception)
         Input::JumpClick(ptJump.x, ptJump.y);
+        CheckAndHandleHotbarItems();
 
         // 2. Flight airtime (220ms - matches natural Conquer Online jump arc)
         if (!SafeSleep(220)) break;
