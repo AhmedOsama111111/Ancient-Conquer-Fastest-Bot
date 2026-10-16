@@ -1314,6 +1314,10 @@ void BotEngine::HandleCaptchaPause(const POINT& ptYes) {
     int clickX = ptYes.x;
     int clickY = ptYes.y;
     if (clickX > 0 && clickY > 0) {
+        Input::HoldCtrl(false);
+        Input::LeftUp();
+        Input::RightUp();
+        SafeSleep(60);
         std::cout << "[*] Clicking [Yes] button at Screen (" << clickX << ", " << clickY << ")...\n";
         Input::MoveToSmooth(clickX, clickY, 1.0);
         SafeSleep(100);
@@ -1338,8 +1342,11 @@ void BotEngine::HandleCaptchaPause(const POINT& ptYes) {
         HWND rootBrowser = GetAncestor(bHwnd, GA_ROOT);
         if (!rootBrowser) rootBrowser = bHwnd;
 
+        // Ensure browser is focused to receive Ctrl+W
+        SetForegroundWindow(bHwnd);
+        SafeSleep(80);
         Input::SendCtrlW();
-        SafeSleep(150);
+        SafeSleep(200);
 
         ShowWindowAsync(rootBrowser, SW_MINIMIZE);
         ShowWindow(rootBrowser, SW_MINIMIZE);
@@ -1352,7 +1359,7 @@ void BotEngine::HandleCaptchaPause(const POINT& ptYes) {
 
     // Restore and focus Conquer Online
     RestoreAndFocusGame(gameHwnd);
-    SafeSleep(200);
+    SafeSleep(250);
 
     // Re-engage hunting & patrol
     Input::HoldCtrl(true);
@@ -1511,7 +1518,7 @@ void BotEngine::RestoreAndFocusGame(HWND hwnd) {
     SafeSleep(60);
 
     // 5. Hardware Driver Alt+Tab fallback if Windows still refused foreground transfer
-    if (GetForegroundWindow() != hwnd) {
+    for (int retry = 0; retry < 5 && GetForegroundWindow() != hwnd; retry++) {
         std::cout << "[*] Windows focus lock detected: Engaging Hardware Alt+Tab driver fallback...\n";
         Input::SendAltTab();
         SafeSleep(120);
@@ -1519,20 +1526,24 @@ void BotEngine::RestoreAndFocusGame(HWND hwnd) {
         SetWindowPos(hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
         SetForegroundWindow(hwnd);
         BringWindowToTop(hwnd);
+        SafeSleep(80);
     }
 
     // 6. Physical click inside the game window client area to guarantee active input focus
-    RECT rc;
-    if (GetClientRect(hwnd, &rc)) {
-        int gw = rc.right - rc.left;
-        int gh = rc.bottom - rc.top;
-        if (gw > 200 && gh > 200) {
-            POINT ptFocus = { gw / 2, 80 }; // Click safely inside top status area of the game
-            ClientToScreen(hwnd, &ptFocus);
-            Input::MoveToInstant(ptFocus.x, ptFocus.y);
-            SafeSleep(20);
-            Input::LeftClick(0.025);
-            SafeSleep(30);
+    // STRICT SAFETY: ONLY click if hwnd is confirmed to be the foreground window! Never click on browser!
+    if (GetForegroundWindow() == hwnd) {
+        RECT rc;
+        if (GetClientRect(hwnd, &rc)) {
+            int gw = rc.right - rc.left;
+            int gh = rc.bottom - rc.top;
+            if (gw > 200 && gh > 200) {
+                POINT ptFocus = { gw / 2, 80 }; // Click safely inside top status area of the game
+                ClientToScreen(hwnd, &ptFocus);
+                Input::MoveToInstant(ptFocus.x, ptFocus.y);
+                SafeSleep(20);
+                Input::LeftClick(0.025);
+                SafeSleep(30);
+            }
         }
     }
 }
@@ -4137,6 +4148,9 @@ void BotEngine::MainLoop() {
         // ====================================================================
         POINT ptYes = { 0, 0 };
         if (CheckSecurityDialog(ptYes)) {
+            Input::HoldCtrl(false);
+            Input::LeftUp();
+            Input::RightUp();
             HandleCaptchaPause(ptYes);
             if (!isRunning.load() || stopFlag.load()) break;
             lastMonsterSeenTick = GetTickCount64();
@@ -4530,12 +4544,28 @@ void BotEngine::MainLoop() {
                 Input::LeftUp();
                 Input::RightUp();
 
+                ULONGLONG watchdogStart = GetTickCount64();
                 while (!stopFlag.load()) {
                     if (GetAsyncKeyState(VK_F9) & 0x8000) { Stop(); break; }
                     if (GetAsyncKeyState(VK_F8) & 1) break;
                     if (IsLoginScreenVisible()) break;
 
-                    // Dismiss Equipment Lock popup if it appears while idle
+                    // 1. Check if Security Check / Captcha appeared while idling!
+                    POINT ptSecYes = { 0, 0 };
+                    if (CheckSecurityDialog(ptSecYes)) {
+                        std::cout << "[*] [Watchdog] Security Check detected while idle! Triggering solver...\n";
+                        HandleCaptchaPause(ptSecYes);
+                        lastMonsterSeenTick = GetTickCount64();
+                        break;
+                    }
+
+                    // 2. Ensure game window is focused and not covered/minimized!
+                    if (IsIconic(gameHwnd) || GetForegroundWindow() != gameHwnd) {
+                        RestoreAndFocusGame(gameHwnd);
+                        SafeSleep(150);
+                    }
+
+                    // 3. Dismiss Equipment Lock popup if it appears while idle
                     CheckAndDismissEquipmentLock();
 
                     SafeSleep(400);
@@ -4548,6 +4578,16 @@ void BotEngine::MainLoop() {
                                   << "========================================================================\n";
                         lastMonsterSeenTick = GetTickCount64();
                         lastVisibleMonsterPixels = mCount;
+                        Input::HoldCtrl(true);
+                        break;
+                    }
+
+                    // 4. TIMEOUT SAFETY: If waiting in watchdog for > 15 seconds without monsters:
+                    // NEVER freeze indefinitely! Take proactive action to advance patrol and respawn/pull mobs!
+                    if (GetTickCount64() - watchdogStart > 15000) {
+                        std::cout << "[*] [Watchdog] 15s idle timeout reached -> Proactively cycling waypoint / resuming patrol to find mobs...\n";
+                        lastMonsterSeenTick = GetTickCount64();
+                        currentWaypointIndex++;
                         Input::HoldCtrl(true);
                         break;
                     }
