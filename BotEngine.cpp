@@ -1207,7 +1207,8 @@ bool BotEngine::IsSecurityDialogVisible(POINT* pYesCenter, bool* pIsNonSecurity)
     }
 
     // High confidence Security Check Captcha (handles small font on 576p/768p and 1080p):
-    bool isCaptcha = (bestSecScore >= 0.25f);
+    // Real Security Captcha scores ~0.99, whereas CPs Reward Dialog (5 or 25 CPs) scores ~0.44.
+    bool isCaptcha = (bestSecScore >= 0.65f);
 
     if (isCaptcha) {
         // CONFIRMED CAPTCHA ("Solve Security Check To Unlock Drop"):
@@ -1810,13 +1811,13 @@ bool BotEngine::AutoSolveBrowserCaptcha() {
 
         // 1. Scan vertical dark row span (where cutout slots exist)
         std::vector<int> darkRows;
-        for (int dy = 35; dy <= 125; dy++) {
+        for (int dy = 40; dy <= 115; dy++) {
             int cy = stageTop + dy;
             if (cy < 0 || cy >= screenH) continue;
             int darkC = 0;
             for (int dx = 50; dx < stageWidth - 10; dx++) {
                 int cx = stageLeft + dx;
-                if (cx >= 0 && cx < screenW && gray[cy * screenW + cx] < 85) {
+                if (cx >= 0 && cx < screenW && gray[cy * screenW + cx] < 90) {
                     darkC++;
                 }
             }
@@ -1831,8 +1832,21 @@ bool BotEngine::AutoSolveBrowserCaptcha() {
             continue;
         }
 
-        int minDy = darkRows.front();
-        int maxDy = darkRows.back();
+        // Find longest consecutive run of dark rows to avoid false rows outside the puzzle
+        std::vector<int> maxRun;
+        std::vector<int> curRun = { darkRows[0] };
+        for (size_t i = 1; i < darkRows.size(); i++) {
+            if (darkRows[i] == curRun.back() + 1) {
+                curRun.push_back(darkRows[i]);
+            } else {
+                if (curRun.size() > maxRun.size()) maxRun = curRun;
+                curRun = { darkRows[i] };
+            }
+        }
+        if (curRun.size() > maxRun.size()) maxRun = curRun;
+
+        int minDy = maxRun.front();
+        int maxDy = maxRun.back();
         int centerDy = (minDy + maxDy) / 2;
         int slotRowY = stageTop + centerDy;
 
@@ -1851,24 +1865,24 @@ bool BotEngine::AutoSolveBrowserCaptcha() {
 
         bool inSegment = false;
         int segStart = 0;
-        for (int dx = 60; dx < stageWidth - 10; dx++) {
+        for (int dx = 48; dx < stageWidth - 8; dx++) {
             int cx = stageLeft + dx;
-            bool isDark = (cx >= 0 && cx < screenW && gray[slotRowY * screenW + cx] < 85);
+            bool isDark = (cx >= 0 && cx < screenW && gray[slotRowY * screenW + cx] < 92);
             if (isDark && !inSegment) {
                 inSegment = true;
                 segStart = dx;
             } else if (!isDark && inSegment) {
                 inSegment = false;
                 int segWidth = dx - segStart;
-                if (segWidth >= 18) {
+                if (segWidth >= 20) {
                     detectedSlots.push_back({ segStart, dx - 1, segWidth, segStart, 9999.0 });
                 }
             }
         }
         if (inSegment) {
-            int segWidth = (stageWidth - 10) - segStart;
-            if (segWidth >= 18) {
-                detectedSlots.push_back({ segStart, stageWidth - 11, segWidth, segStart, 9999.0 });
+            int segWidth = (stageWidth - 8) - segStart;
+            if (segWidth >= 20) {
+                detectedSlots.push_back({ segStart, stageWidth - 9, segWidth, segStart, 9999.0 });
             }
         }
 
@@ -1880,18 +1894,21 @@ bool BotEngine::AutoSolveBrowserCaptcha() {
 
         std::cout << "[CaptchaSolver] [+] Found " << detectedSlots.size() << " candidate slot(s).\n";
 
-        // 3. Score candidate slots against piece using top & bottom edge color continuity
-        const int colCount = 35; // columns 5 to 39
+        // 3. Multi-directional edge continuity (Top, Bottom, Left, Right) + Context color scoring:
+        // Ensures 100% precision even when candidate slots have very similar background colors!
+        const int colCount = 36; // columns 4 to 39
+        const int rowCount = (std::max)(10, maxDy - minDy - 12);
+
+        // Piece top and bottom horizontal edge colors
         std::vector<float> pTopR(colCount, 0), pTopG(colCount, 0), pTopB(colCount, 0);
         std::vector<float> pBotR(colCount, 0), pBotG(colCount, 0), pBotB(colCount, 0);
-
         int topSampleRows = 0;
-        for (int dy = minDy + 3; dy <= minDy + 8; dy++) {
+        for (int dy = minDy + 2; dy <= minDy + 6; dy++) {
             int cy = stageTop + dy;
             if (cy < 0 || cy >= screenH) continue;
             topSampleRows++;
             for (int c = 0; c < colCount; c++) {
-                int cx = stageLeft + 5 + c;
+                int cx = stageLeft + 4 + c;
                 if (cx >= 0 && cx < screenW) {
                     uint32_t px = pixels[cy * screenW + cx];
                     pTopB[c] += (px & 0xFF);
@@ -1907,12 +1924,12 @@ bool BotEngine::AutoSolveBrowserCaptcha() {
         }
 
         int botSampleRows = 0;
-        for (int dy = maxDy - 8; dy <= maxDy - 3; dy++) {
+        for (int dy = maxDy - 6; dy <= maxDy - 2; dy++) {
             int cy = stageTop + dy;
             if (cy < 0 || cy >= screenH) continue;
             botSampleRows++;
             for (int c = 0; c < colCount; c++) {
-                int cx = stageLeft + 5 + c;
+                int cx = stageLeft + 4 + c;
                 if (cx >= 0 && cx < screenW) {
                     uint32_t px = pixels[cy * screenW + cx];
                     pBotB[c] += (px & 0xFF);
@@ -1927,18 +1944,73 @@ bool BotEngine::AutoSolveBrowserCaptcha() {
             }
         }
 
+        // Piece left and right vertical edge colors
+        std::vector<float> pLeftR(rowCount, 0), pLeftG(rowCount, 0), pLeftB(rowCount, 0);
+        std::vector<float> pRightR(rowCount, 0), pRightG(rowCount, 0), pRightB(rowCount, 0);
+        int lrSampleCols = 0;
+        for (int c = 0; c < 5; c++) {
+            lrSampleCols++;
+            for (int r = 0; r < rowCount; r++) {
+                int cy = stageTop + minDy + 6 + r;
+                int cxLeft = stageLeft + 2 + c;
+                int cxRight = stageLeft + 38 + c;
+                if (cy >= 0 && cy < screenH) {
+                    if (cxLeft >= 0 && cxLeft < screenW) {
+                        uint32_t px = pixels[cy * screenW + cxLeft];
+                        pLeftB[r] += (px & 0xFF);
+                        pLeftG[r] += ((px >> 8) & 0xFF);
+                        pLeftR[r] += ((px >> 16) & 0xFF);
+                    }
+                    if (cxRight >= 0 && cxRight < screenW) {
+                        uint32_t px = pixels[cy * screenW + cxRight];
+                        pRightB[r] += (px & 0xFF);
+                        pRightG[r] += ((px >> 8) & 0xFF);
+                        pRightR[r] += ((px >> 16) & 0xFF);
+                    }
+                }
+            }
+        }
+        if (lrSampleCols > 0) {
+            for (int r = 0; r < rowCount; r++) {
+                pLeftR[r] /= lrSampleCols; pLeftG[r] /= lrSampleCols; pLeftB[r] /= lrSampleCols;
+                pRightR[r] /= lrSampleCols; pRightG[r] /= lrSampleCols; pRightB[r] /= lrSampleCols;
+            }
+        }
+
+        // Piece interior mean color
+        float pIntR = 0.0f, pIntG = 0.0f, pIntB = 0.0f;
+        int pIntCount = 0;
+        for (int dy = minDy + 8; dy <= maxDy - 8; dy++) {
+            int cy = stageTop + dy;
+            if (cy < 0 || cy >= screenH) continue;
+            for (int dx = 8; dx <= 36; dx++) {
+                int cx = stageLeft + dx;
+                if (cx >= 0 && cx < screenW) {
+                    uint32_t px = pixels[cy * screenW + cx];
+                    pIntB += (px & 0xFF);
+                    pIntG += ((px >> 8) & 0xFF);
+                    pIntR += ((px >> 16) & 0xFF);
+                    pIntCount++;
+                }
+            }
+        }
+        if (pIntCount > 0) {
+            pIntR /= pIntCount; pIntG /= pIntCount; pIntB /= pIntCount;
+        }
+
         for (auto& slot : detectedSlots) {
             int sx = slot.left;
-            // Top continuity error
+
+            // 1) Top boundary continuity error
             double topErr = 0.0;
             int bgTopRows = 0;
             std::vector<float> bgTopR(colCount, 0), bgTopG(colCount, 0), bgTopB(colCount, 0);
-            for (int dy = minDy - 8; dy <= minDy - 2; dy++) {
+            for (int dy = minDy - 6; dy <= minDy - 1; dy++) {
                 int cy = stageTop + dy;
                 if (cy < 0 || cy >= screenH) continue;
                 bgTopRows++;
                 for (int c = 0; c < colCount; c++) {
-                    int cx = stageLeft + sx + 5 + c;
+                    int cx = stageLeft + sx + 4 + c;
                     if (cx >= 0 && cx < screenW) {
                         uint32_t px = pixels[cy * screenW + cx];
                         bgTopB[c] += (px & 0xFF);
@@ -1955,16 +2027,16 @@ bool BotEngine::AutoSolveBrowserCaptcha() {
                 topErr /= (colCount * 3.0);
             }
 
-            // Bottom continuity error
+            // 2) Bottom boundary continuity error
             double botErr = 0.0;
             int bgBotRows = 0;
             std::vector<float> bgBotR(colCount, 0), bgBotG(colCount, 0), bgBotB(colCount, 0);
-            for (int dy = maxDy + 2; dy <= maxDy + 8; dy++) {
+            for (int dy = maxDy + 1; dy <= maxDy + 6; dy++) {
                 int cy = stageTop + dy;
                 if (cy < 0 || cy >= screenH) continue;
                 bgBotRows++;
                 for (int c = 0; c < colCount; c++) {
-                    int cx = stageLeft + sx + 5 + c;
+                    int cx = stageLeft + sx + 4 + c;
                     if (cx >= 0 && cx < screenW) {
                         uint32_t px = pixels[cy * screenW + cx];
                         bgBotB[c] += (px & 0xFF);
@@ -1981,10 +2053,84 @@ bool BotEngine::AutoSolveBrowserCaptcha() {
                 botErr /= (colCount * 3.0);
             }
 
-            slot.score = topErr + botErr;
+            // 3) Left boundary continuity error
+            double leftErr = 0.0;
+            if (sx >= 5) {
+                int bgLeftCols = 0;
+                std::vector<float> bgLeftR(rowCount, 0), bgLeftG(rowCount, 0), bgLeftB(rowCount, 0);
+                for (int c = 0; c < 5; c++) {
+                    int cx = stageLeft + sx - 5 + c;
+                    if (cx < 0 || cx >= screenW) continue;
+                    bgLeftCols++;
+                    for (int r = 0; r < rowCount; r++) {
+                        int cy = stageTop + minDy + 6 + r;
+                        if (cy >= 0 && cy < screenH) {
+                            uint32_t px = pixels[cy * screenW + cx];
+                            bgLeftB[r] += (px & 0xFF);
+                            bgLeftG[r] += ((px >> 8) & 0xFF);
+                            bgLeftR[r] += ((px >> 16) & 0xFF);
+                        }
+                    }
+                }
+                if (bgLeftCols > 0) {
+                    for (int r = 0; r < rowCount; r++) {
+                        bgLeftR[r] /= bgLeftCols; bgLeftG[r] /= bgLeftCols; bgLeftB[r] /= bgLeftCols;
+                        leftErr += std::abs(pLeftR[r] - bgLeftR[r]) + std::abs(pLeftG[r] - bgLeftG[r]) + std::abs(pLeftB[r] - bgLeftB[r]);
+                    }
+                    leftErr /= (rowCount * 3.0);
+                }
+            }
+
+            // 4) Right boundary continuity error
+            double rightErr = 0.0;
+            if (sx + 44 + 5 <= stageWidth) {
+                int bgRightCols = 0;
+                std::vector<float> bgRightR(rowCount, 0), bgRightG(rowCount, 0), bgRightB(rowCount, 0);
+                for (int c = 0; c < 5; c++) {
+                    int cx = stageLeft + sx + 44 + c;
+                    if (cx < 0 || cx >= screenW) continue;
+                    bgRightCols++;
+                    for (int r = 0; r < rowCount; r++) {
+                        int cy = stageTop + minDy + 6 + r;
+                        if (cy >= 0 && cy < screenH) {
+                            uint32_t px = pixels[cy * screenW + cx];
+                            bgRightB[r] += (px & 0xFF);
+                            bgRightG[r] += ((px >> 8) & 0xFF);
+                            bgRightR[r] += ((px >> 16) & 0xFF);
+                        }
+                    }
+                }
+                if (bgRightCols > 0) {
+                    for (int r = 0; r < rowCount; r++) {
+                        bgRightR[r] /= bgRightCols; bgRightG[r] /= bgRightCols; bgRightB[r] /= bgRightCols;
+                        rightErr += std::abs(pRightR[r] - bgRightR[r]) + std::abs(pRightG[r] - bgRightG[r]) + std::abs(pRightB[r] - bgRightB[r]);
+                    }
+                    rightErr /= (rowCount * 3.0);
+                }
+            }
+
+            // 5) Context mean color error
+            double colErr = 0.0;
+            if (bgTopRows > 0 && bgBotRows > 0) {
+                float avgTopR = 0.0f, avgTopG = 0.0f, avgTopB = 0.0f;
+                float avgBotR = 0.0f, avgBotG = 0.0f, avgBotB = 0.0f;
+                for (int c = 0; c < colCount; c++) {
+                    avgTopR += bgTopR[c]; avgTopG += bgTopG[c]; avgTopB += bgTopB[c];
+                    avgBotR += bgBotR[c]; avgBotG += bgBotG[c]; avgBotB += bgBotB[c];
+                }
+                avgTopR /= colCount; avgTopG /= colCount; avgTopB /= colCount;
+                avgBotR /= colCount; avgBotG /= colCount; avgBotB /= colCount;
+                float ctxR = (avgTopR + avgBotR) * 0.5f;
+                float ctxG = (avgTopG + avgBotG) * 0.5f;
+                float ctxB = (avgTopB + avgBotB) * 0.5f;
+                colErr = (std::abs(pIntR - ctxR) + std::abs(pIntG - ctxG) + std::abs(pIntB - ctxB)) / 3.0;
+            }
+
+            slot.score = topErr + botErr + leftErr + rightErr + (colErr * 0.5);
             std::cout << "  Candidate at x=" << sx << " (DeltaX=+" << slot.deltaX 
                       << "px): topErr=" << (int)topErr << ", botErr=" << (int)botErr 
-                      << ", totalError=" << (int)slot.score << "\n";
+                      << ", leftErr=" << (int)leftErr << ", rightErr=" << (int)rightErr 
+                      << ", colErr=" << (int)colErr << " => totalError=" << (int)slot.score << "\n";
         }
 
         // Sort candidate slots by lowest total continuity error
