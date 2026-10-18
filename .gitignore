@@ -1,56 +1,13 @@
-# Visual Studio & MSBuild intermediate files
+# Visual Studio intermediate objects
 build_int/
-build_int_test/
 __pycache__/
-x64/
-Debug/
-Release/
 *.obj
-*.pdb
-*.ilk
-*.idb
 *.tlog
+*.idb
+*.ilk
 *.lastbuildstate
 *.iobj
 *.ipdb
-
-# Visual Studio temporary files
 .vs/
 *.suo
 *.user
-
-# Executables & binaries
-*.exe
-*.lib
-*.exp
-!interception.dll
-
-# Subfolders with frame dumps
-loot_action_frames/
-loot_demo_frames/
-scratch/
-
-# Ignore all test and dump images by default
-*.jpg
-*.png
-*.bmp
-
-# Whitelist essential templates and button icons
-!yes_button.png
-!yes_button_1080p.png
-!yes_button.bmp
-!yes_button_1080p.bmp
-!yes_btn.png
-!yes_exact1.png
-!yes_exact2.png
-!yes_center_10x10.png
-!sycee_tmpl.bmp
-!speed_skill_icon.bmp
-!skill_*.png
-!skill_*.bmp
-!target_*.png
-!word_*.png
-!zoom_*.png
-!btn_yes.bmp
-!btn_no.bmp
-!prompt_box_yes_no.bmp

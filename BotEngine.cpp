@@ -694,6 +694,31 @@ static const uint8_t BTN_NO_PIXELS[18][41] = {
 };
 static float s_normBtnNo[BTN_NO_H][BTN_NO_W];
 
+// Modern [Yes] Button Template (41x18)
+static const int BTN_YES_W = 41;
+static const int BTN_YES_H = 18;
+static const uint8_t BTN_YES_PIXELS[18][41] = {
+    {  21,   5, 205,  71,  71,  13,  13,  13,  13,  15,  15,  15,  15,  15,  15,  15,  15,  12,  12,  12,  12,  12,  12,  12,  12,  15,  15,  15,  15,  15,  15,  15,  15,   9,   9,  65,  65,  75,  50,   0,  25 },
+    {  21,  23, 233,  92,  23,  44,  44, 235, 235, 206, 206, 206, 206, 214, 214, 214, 152, 169, 169, 169, 169, 173, 173, 173, 173, 173, 122, 122, 122,  94,  94,  72,  50,  38,  38,  23,  52,  64,  64,   8,  25 },
+    {  37,  23, 233,  92,  23,  44, 235, 106,  44,  27,  27,  27,  27,  24,  24,  24,  24,  36,  36,  36,  36,  11,  11,  11,  11,  19,  19,  19,  19,  28,  28,  28,  28,  23,  23,  23,  10, 180,  64,   8,  25 },
+    {  56,  23, 233,  92,  23, 235, 106,  44,  44,  27,  27,  27,  27,  24,  24,  24,  24,  36,  36,  36,  36,  64,  11,  11,  11,  19,  19,  19,  19,  28,  28,  28,  28,  38,  38,  23,  10, 180,  64,   8,  24 },
+    {  64,  23, 233,  92,  23, 173,  44,  44,  44,  27,  27,  27, 147, 214, 214, 152,  86, 234, 234, 101,  36,  64,  64,  11,  11,  19,  19,  19,  19,  28,  28,  28,  28,  38,  38,  38,  10, 180,  64,   8,  21 },
+    {  60,  26, 233,  94,  26, 168,  48,  48,  48,  56,  56,  56,  45, 195, 195,  18,  18, 125, 125,  66,  66,  76,  76,  20,  20,  18,  18,  18,  18,  23,  23,  23,  40,  51,  51,  51,  28, 175,  60,   5,  24 },
+    {  52,  26, 233,  94,  26, 168,  48,  48,  48,  70,  70,  70,  70,  76, 195,  76,  18, 181,  66,  10,  10,  20,  76,  20,  20,  18,  18,  74,  74,  59,  40,  23,  23,  28,  51,  51,  28, 175,  60,   5,  21 },
+    {  59,  26, 233,  94,  26, 168,  48,  87,  87,  81,  81,  81,  81,  18, 195, 137,  76, 181,  66,  10, 181, 190, 190,  20,  76, 191, 191, 191,  74,  76,  76,  59,  40,  39,  62,  62,  39, 175,  60,   5,  22 },
+    {  20,  26, 233,  94,  26, 168,  48,  87,  87,  81,  81,  81,  81,  76, 137, 137, 137, 125,  10,  66, 181,  20, 190, 135, 135, 134,  74, 191,  74,  76,  76,  76,  76,  62,  51,  51,  28, 175,  60,   5,  23 },
+    {  21,  30, 235,  97,  30, 123,  77,  92,  92,  92,  92,  92,  87,  74,  74, 204, 204,  80,  22, 141, 141,  29, 155, 155, 155, 153,  90,  90,  90,  90,  90,  90,  90,  82,  82,  61,  40, 178,  61,   5,  25 },
+    {  23,  30, 235,  97,  30, 123,  92,  92,  92,  97,  92,  92,  92,  74,  10, 204, 140,  80,  22, 199, 199, 216, 216, 155,  91, 212, 212, 153,  90,  90,  95,  95,  95, 104, 104,  82,  40, 178,  61,   5,  23 },
+    {  26,  30, 235,  97,  30, 123,  92,  92, 108, 101,  97,  97,  92,  74,  10, 204, 140,  80,  80, 141, 141,  91,  29,  29,  91,  90,  90, 212,  90, 101, 101, 101, 101, 104, 104, 104,  61, 178,  61,   5,  24 },
+    {  29,  30, 235,  97,  30, 108,  77,  92, 108, 101, 101,  97,  87,  10,  10, 204, 140,  80,  80,  22, 199,  29,  91, 155, 155,  31,  90, 212,  90, 107, 107, 107, 107, 104, 104, 104,  61, 178,  61,   5,  21 },
+    {  29,  13, 212,  79,  13,  94,  52,  94,  94, 103, 103, 103, 103,  72, 212, 212, 212, 138,  80, 108, 166, 213, 213, 120, 168, 209, 209, 165, 117, 117, 117, 117, 117, 114, 114,  77,  77, 201,  69,   5,  24 },
+    {  23,  13, 212,  79,  79,  52,  52,  94,  94, 103, 103, 103, 103,  72, 118,  72, 118,  80,  80, 108, 108, 120, 120, 120, 120, 117, 117, 117, 117, 117, 117, 117, 117, 114,  77,  77, 153, 136,  69,   5,  24 },
+    {  26,  13,  79, 146, 146,  52,  52,  52,  52,  71,  71,  71,  71,  72,  72,  72,  72,  80,  80,  80,  80,  75,  75,  75,  75,  73,  73,  73,  73,  83,  83,  83,  83,  77,  77, 153, 153,  69,  69,   5,  27 },
+    {  22,  95,  13,  79, 146, 139, 181, 181, 181, 169, 169, 169, 169, 166, 166, 166, 166, 166, 166, 166, 166, 168, 168, 168, 168, 165, 165, 165, 165, 152, 186, 186, 186, 191, 153, 153,  77,  69,   5,  27,  30 },
+    {  97,  76,  82,   0,  90, 136, 136, 136, 136, 136, 136, 136, 136, 128, 128, 128, 128, 103, 103, 103, 103, 103, 103, 103, 103,  97,  97,  97,  97,  95,  95,  95,  95,  88,  88,  88,  59,   6,  27,  27,  27 },
+};
+static float s_normBtnYes[BTN_YES_H][BTN_YES_W];
+
 static const int SECURITY_W = 54;
 static const int SECURITY_H = 14;
 static const uint8_t SECURITY_PIXELS[14][54] = {
@@ -713,6 +738,48 @@ static const uint8_t SECURITY_PIXELS[14][54] = {
     { 47, 47, 47, 45, 44, 48, 47, 48, 49, 45, 44, 47, 47, 46, 47, 47, 47, 47, 46, 43, 43, 44, 43, 43, 43, 44, 45, 44, 43, 42, 44, 45, 46, 46, 45, 48, 47, 45, 45, 46, 48, 45, 43, 45, 230, 230, 52, 43, 48, 46, 42, 48, 48, 46 },
 };
 static float s_normSecurity[SECURITY_H][SECURITY_W];
+
+// "captcha" word template (46x14)
+static const int CAPTCHA_W = 46;
+static const int CAPTCHA_H = 14;
+static const uint8_t CAPTCHA_PIXELS[14][46] = {
+    {  22,  21,  21, 226,  21, 226, 226, 226,  21,  21, 226, 226, 226, 226,  24,  21, 226, 226, 226,  65,  87,  87, 226,  30, 226, 226, 226,  78,  50,  58,  58, 226, 226, 226, 226,  56,  63,  63,  44,  70,  71, 226, 226, 226, 226,  57 },
+    { 226,  22,  22, 226, 226,  22,  22,  22, 226,  21,  43, 226,  39,  35,  28, 226,  24,  28,  57, 226,  89, 101, 226, 226,  46,  59,  79, 226,  56,  40, 226,  65,  94,  90,  67, 226,  78,  51,  49,  44,  50,  31, 226,  46,  82,  48 },
+    { 226,  23,  22, 226,  25,  24,  23,  23, 226,  21,  21, 226,  41,  41,  54, 226,  40,  33,  51,  83,  93,  97, 226, 111, 107,  69,  51, 226,  36,  44,  39,  89,  98,  91,  75, 226,  55,  61,  53,  54,  64,  43, 226,  54,  80,  40 },
+    { 226,  23,  22, 226,  23,  25,  25,  24, 226,  23,  21, 226,  21,  54,  98, 226,  89,  69,  66,  55,  85,  94, 226, 102, 104,  93,  62, 226,  42,  59,  67,  71, 226, 226, 226, 226,  70,  69,  58,  78,  94,  79, 226,  47,  72,  65 },
+    { 226,  22,  22, 226,  22,  23,  24,  24, 226,  25,  23, 226,  22,  22,  86, 226, 107,  99,  90,  71,  71,  79, 226, 103,  94,  83,  51, 226,  47,  96,  97, 226,  90,  99,  93, 226,  84,  54,  74,  68,  79,  47, 226,  37,  59,  82 },
+    { 226,  22,  22, 226,  23,  23,  24,  24, 226,  25,  23, 226,  22,  22,  22, 226,  98, 108, 106,  96,  93,  90, 226,  94,  81,  66,  46, 226,  74, 103, 226, 109, 100,  90,  81, 226,  63,  64,  61,  61,  67,  37, 226,  37,  52,  95 },
+    { 226,  24,  24, 226, 226,  23,  24,  24, 226,  23,  23, 226,  22,  22,  22, 226,  22,  93, 106, 226, 108, 110, 226,  87,  64,  56,  41, 226,  93, 103, 226, 103, 106,  92, 226, 226,  56,  74,  55,  63,  49,  51, 226,  33,  40,  69 },
+    { 226,  24,  24, 226,  23, 226, 226, 226,  24,  24,  24, 226, 226, 226,  22,  22, 226, 226, 226, 102, 107, 110, 226,  84,  64,  41,  34, 226,  90,  94,  97, 226, 226, 226,  55, 226,  44,  76,  96,  49,  49,  46, 226,  39,  40,  56 },
+    {  24,  24,  25, 226,  24,  24,  24,  25,  24,  25,  25,  24,  27,  25,  23,  23,  23,  23,  23,  23,  79,  97, 101,  74,  49,  46,  47,  59,  86,  90,  95,  89,  76,  67,  55,  47,  52,  85,  94,  77,  50,  47,  51,  54,  43,  63 },
+    {  24,  25,  25, 226,  24,  24,  24,  24,  24,  25,  25,  27,  27,  27,  25,  25,  23,  23,  23,  22,  22,  64,  72,  59,  37,  44,  72,  96,  85,  79,  85,  77,  44,  50,  65,  66,  87,  93,  84,  88,  49,  60,  46,  57,  45,  38 },
+    {  23,  23,  23, 226,  23,  23,  23,  24,  23,  23,  25,  27,  27,  27,  27,  25,  23,  21,  23,  24,  23,  23,  22,  49,  41,  60,  92,  93,  97,  94,  83,  57,  37,  55,  89,  88, 103,  91,  92,  73,  41,  71,  54,  43,  57,  38 },
+    {  23,  23,  23,  26,  25,  24,  23,  24,  23,  23,  23,  25,  25,  23,  22,  22,  21,  23,  27,  27,  23,  23,  22,  23,  52,  71,  86,  88,  86,  94,  89,  65,  51,  70,  83,  91, 108, 108,  89,  60,  46,  53,  66,  53,  49,  32 },
+    {  26,  26,  26,  26,  25,  24,  25,  25,  23,  23,  23,  21,  20,  20,  22,  22,  23,  24,  24,  23,  22,  22,  23,  22,  20,  82,  89,  89,  75,  76,  82,  69,  53,  72,  57,  89, 101,  99,  63,  44,  55,  56,  84,  66,  50,  39 },
+    {  26,  28,  28,  26,  25,  24,  24,  25,  25,  23,  23,  23,  20,  23,  24,  24,  27,  27,  23,  23,  23,  24,  24,  24,  23,  22,  21, 103,  96,  87,  60,  57,  47,  57,  78,  91,  77,  59,  43,  40,  60,  58,  58,  63,  44,  33 },
+};
+static float s_normCaptcha[CAPTCHA_H][CAPTCHA_W];
+
+// "CPs" word template (30x14)
+static const int CPS_W = 30;
+static const int CPS_H = 14;
+static const uint8_t CPS_PIXELS[14][30] = {
+    {  43,  43,  43,  43,  43,  44,  42,  43,  43,  43,  43,  42,  42,  43,  43,  43,  43,  43,  42,  42,  42,  42,  41,  43,  43,  42,  43,  42,  43,  43 },
+    {  44,  43,  43,  43,  43,  43,  44, 226, 226, 226, 226,  43,  43,  43,  43, 226, 226, 226, 226, 226, 226,  42,  42,  43,  43,  41,  42,  44,  43,  43 },
+    {  43,  42,  42,  43,  43,  43, 226,  43,  43,  44,  43, 226,  43,  43,  43, 226,  43,  43,  43,  42,  43, 226,  43,  43,  43,  43,  43,  44,  43,  43 },
+    {  42,  42,  43,  43,  42, 226,  43,  42,  43,  43,  43,  41, 226,  42,  43, 226,  43,  43,  43,  43,  43, 226,  43,  43,  44, 226, 226, 226,  44,  43 },
+    {  43,  43,  43,  43,  43, 226,  44,  44,  44,  43,  43,  44,  44,  43,  42, 226,  43,  43,  43,  42,  43, 226,  43,  44, 226,  44,  43,  43, 226,  43 },
+    {  43,  43,  43,  43,  43, 226,  43,  43,  44,  43,  43,  43,  43,  43,  43, 226,  43,  43,  43,  43,  43, 226,  43,  44, 226,  43,  44,  44,  44,  43 },
+    {  43,  42,  42,  43,  43, 226,  43,  43,  43,  43,  43,  42,  43,  43,  43, 226, 226, 226, 226, 226, 226,  44,  43,  43,  44, 226, 226, 226,  44,  44 },
+    {  42,  43,  43,  43,  43, 226,  44,  43,  43,  45,  43,  43,  43,  43,  43, 226,  44,  44,  44,  44,  44,  43,  44,  44,  44,  44,  44,  44, 226,  44 },
+    {  43,  42,  44,  44,  44, 226,  44,  43,  43,  43,  43,  43, 226,  43,  43, 226,  44,  44,  44,  44,  44,  43,  44,  44,  44,  43,  43,  43, 226,  44 },
+    {  43,  43,  44,  41,  41,  45, 226,  43,  43,  43,  42, 226,  43,  43,  43, 226,  43,  43,  43,  43,  44,  43,  43,  43, 226,  44,  43,  43, 226,  41 },
+    {  43,  43,  42,  41,  44,  45,  43, 226, 226, 226, 226,  43,  43,  43,  45, 226,  45,  45,  43,  43,  44,  45,  44,  44,  44, 226, 226, 226,  44,  44 },
+    {  44,  43,  43,  44,  45,  44,  44,  44,  42,  43,  44,  44,  44,  43,  44,  44,  44,  45,  44,  44,  44,  44,  42,  44,  43,  44,  44,  42,  44,  44 },
+    {  44,  46,  44,  43,  46,  44,  45,  44,  43,  44,  44,  44,  45,  44,  43,  43,  44,  43,  43,  43,  43,  44,  43,  42,  43,  43,  43,  43,  43,  43 },
+    {  44,  46,  41,  44,  44,  44,  43,  43,  42,  43,  43,  44,  43,  42,  43,  43,  43,  43,  43,  43,  43,  43,  43,  42,  42,  43,  43,  43,  43,  43 },
+};
+static float s_normCps[CPS_H][CPS_W];
 
 static bool s_tmplInit = false;
 
@@ -869,6 +936,96 @@ static void InitYesTemplate() {
         }
     }
 
+    // 5. Initialize 41x18 [Yes] button template (Modern Dialogs)
+    {
+        bool loadedYes = false;
+        FILE* fp = nullptr;
+        fopen_s(&fp, "btn_yes.bmp", "rb");
+        if (fp) {
+            BITMAPFILEHEADER bfh;
+            BITMAPINFOHEADER bih;
+            if (fread(&bfh, sizeof(bfh), 1, fp) == 1 &&
+                fread(&bih, sizeof(bih), 1, fp) == 1 &&
+                bih.biWidth == BTN_YES_W && std::abs(bih.biHeight) == BTN_YES_H) {
+                std::cout << "[+] [Vision] Loaded \"btn_yes.bmp\" (41x18) directly from folder!\n";
+                loadedYes = true;
+            }
+            fclose(fp);
+        }
+        if (!loadedYes) {
+            std::cout << "[+] [Vision] Loaded embedded [Yes] button template (41x18).\n";
+        }
+
+        const int N = BTN_YES_W * BTN_YES_H;
+        float sum = 0.0f;
+        for (int y = 0; y < BTN_YES_H; y++) {
+            for (int x = 0; x < BTN_YES_W; x++) sum += BTN_YES_PIXELS[y][x];
+        }
+        float mean = sum / N;
+        float var = 0.0f;
+        for (int y = 0; y < BTN_YES_H; y++) {
+            for (int x = 0; x < BTN_YES_W; x++) {
+                float d = BTN_YES_PIXELS[y][x] - mean;
+                var += d * d;
+            }
+        }
+        float stdVal = std::sqrt(var);
+        if (stdVal < 1.0f) stdVal = 1.0f;
+        for (int y = 0; y < BTN_YES_H; y++) {
+            for (int x = 0; x < BTN_YES_W; x++) {
+                s_normBtnYes[y][x] = (BTN_YES_PIXELS[y][x] - mean) / stdVal;
+            }
+        }
+    }
+
+    // 6. Initialize 46x14 "captcha" word template
+    {
+        const int N = CAPTCHA_W * CAPTCHA_H;
+        float sum = 0.0f;
+        for (int y = 0; y < CAPTCHA_H; y++) {
+            for (int x = 0; x < CAPTCHA_W; x++) sum += CAPTCHA_PIXELS[y][x];
+        }
+        float mean = sum / N;
+        float var = 0.0f;
+        for (int y = 0; y < CAPTCHA_H; y++) {
+            for (int x = 0; x < CAPTCHA_W; x++) {
+                float d = CAPTCHA_PIXELS[y][x] - mean;
+                var += d * d;
+            }
+        }
+        float stdVal = std::sqrt(var);
+        if (stdVal < 1.0f) stdVal = 1.0f;
+        for (int y = 0; y < CAPTCHA_H; y++) {
+            for (int x = 0; x < CAPTCHA_W; x++) {
+                s_normCaptcha[y][x] = (CAPTCHA_PIXELS[y][x] - mean) / stdVal;
+            }
+        }
+    }
+
+    // 7. Initialize 30x14 "CPs" word template
+    {
+        const int N = CPS_W * CPS_H;
+        float sum = 0.0f;
+        for (int y = 0; y < CPS_H; y++) {
+            for (int x = 0; x < CPS_W; x++) sum += CPS_PIXELS[y][x];
+        }
+        float mean = sum / N;
+        float var = 0.0f;
+        for (int y = 0; y < CPS_H; y++) {
+            for (int x = 0; x < CPS_W; x++) {
+                float d = CPS_PIXELS[y][x] - mean;
+                var += d * d;
+            }
+        }
+        float stdVal = std::sqrt(var);
+        if (stdVal < 1.0f) stdVal = 1.0f;
+        for (int y = 0; y < CPS_H; y++) {
+            for (int x = 0; x < CPS_W; x++) {
+                s_normCps[y][x] = (CPS_PIXELS[y][x] - mean) / stdVal;
+            }
+        }
+    }
+
     s_tmplInit = true;
 }
 
@@ -1018,22 +1175,22 @@ bool BotEngine::IsSecurityDialogVisible(POINT* pYesCenter, bool* pIsNonSecurity)
     int xStart = (int)(winW * (is1080p ? 0.20 : 0.15));
     int xEnd   = (int)(winW * (is1080p ? 0.60 : 0.70));
 
-    // 1. Scan for [Yes] button
-    float bestYesScore = -1.0f;
-    int bestYesX = 0, bestYesY = 0;
-    for (int y = yStart; y <= yEnd - tmplH; y++) {
-        for (int x = xStart; x <= xEnd - tmplW; x++) {
-            const int N = tmplW * tmplH;
+    // 1. Scan for Modern [Yes] button (41x18)
+    float bestBtnYesScore = -1.0f;
+    int bestBtnYesX = 0, bestBtnYesY = 0;
+    for (int y = yStart; y <= yEnd - BTN_YES_H; y += 2) {
+        for (int x = xStart; x <= xEnd - BTN_YES_W; x += 2) {
+            const int N = BTN_YES_W * BTN_YES_H;
             float pSum = 0.0f;
-            for (int ty = 0; ty < tmplH; ty++) {
+            for (int ty = 0; ty < BTN_YES_H; ty++) {
                 const uint8_t* row = &gray[(y + ty) * winW + x];
-                for (int tx = 0; tx < tmplW; tx++) pSum += row[tx];
+                for (int tx = 0; tx < BTN_YES_W; tx++) pSum += row[tx];
             }
             float pMean = pSum / N;
             float pVar = 0.0f;
-            for (int ty = 0; ty < tmplH; ty++) {
+            for (int ty = 0; ty < BTN_YES_H; ty++) {
                 const uint8_t* row = &gray[(y + ty) * winW + x];
-                for (int tx = 0; tx < tmplW; tx++) {
+                for (int tx = 0; tx < BTN_YES_W; tx++) {
                     float d = row[tx] - pMean;
                     pVar += d * d;
                 }
@@ -1042,25 +1199,67 @@ bool BotEngine::IsSecurityDialogVisible(POINT* pYesCenter, bool* pIsNonSecurity)
             if (pStd < 1.0f) continue;
 
             float dot = 0.0f;
-            for (int ty = 0; ty < tmplH; ty++) {
+            for (int ty = 0; ty < BTN_YES_H; ty++) {
                 const uint8_t* row = &gray[(y + ty) * winW + x];
-                for (int tx = 0; tx < tmplW; tx++) {
-                    float normVal = is1080p ? s_norm1080[ty][tx] : s_normTmpl[ty][tx];
-                    dot += normVal * (row[tx] - pMean);
+                for (int tx = 0; tx < BTN_YES_W; tx++) {
+                    dot += s_normBtnYes[ty][tx] * (row[tx] - pMean);
                 }
             }
             float score = dot / pStd;
-            if (score > bestYesScore) {
-                bestYesScore = score;
-                bestYesX = x;
-                bestYesY = y;
+            if (score > bestBtnYesScore) {
+                bestBtnYesScore = score;
+                bestBtnYesX = x;
+                bestBtnYesY = y;
             }
         }
     }
 
-    // 2. Scan for [No] button
-    float bestNoScore = -1.0f;
-    int bestNoX = 0, bestNoY = 0;
+    // Refine Modern [Yes] button in +/-4 neighborhood (step = 1) to eliminate odd/even grid alignment loss
+    if (bestBtnYesScore >= 0.35f) {
+        int refStartX = (std::max)(xStart, bestBtnYesX - 4);
+        int refEndX   = (std::min)(xEnd - BTN_YES_W, bestBtnYesX + 4);
+        int refStartY = (std::max)(yStart, bestBtnYesY - 4);
+        int refEndY   = (std::min)(yEnd - BTN_YES_H, bestBtnYesY + 4);
+        for (int y = refStartY; y <= refEndY; y++) {
+            for (int x = refStartX; x <= refEndX; x++) {
+                const int N = BTN_YES_W * BTN_YES_H;
+                float pSum = 0.0f;
+                for (int ty = 0; ty < BTN_YES_H; ty++) {
+                    const uint8_t* row = &gray[(y + ty) * winW + x];
+                    for (int tx = 0; tx < BTN_YES_W; tx++) pSum += row[tx];
+                }
+                float pMean = pSum / N;
+                float pVar = 0.0f;
+                for (int ty = 0; ty < BTN_YES_H; ty++) {
+                    const uint8_t* row = &gray[(y + ty) * winW + x];
+                    for (int tx = 0; tx < BTN_YES_W; tx++) {
+                        float d = row[tx] - pMean;
+                        pVar += d * d;
+                    }
+                }
+                float pStd = std::sqrt(pVar);
+                if (pStd < 1.0f) continue;
+
+                float dot = 0.0f;
+                for (int ty = 0; ty < BTN_YES_H; ty++) {
+                    const uint8_t* row = &gray[(y + ty) * winW + x];
+                    for (int tx = 0; tx < BTN_YES_W; tx++) {
+                        dot += s_normBtnYes[ty][tx] * (row[tx] - pMean);
+                    }
+                }
+                float score = dot / pStd;
+                if (score > bestBtnYesScore) {
+                    bestBtnYesScore = score;
+                    bestBtnYesX = x;
+                    bestBtnYesY = y;
+                }
+            }
+        }
+    }
+
+    // 2. Scan for Modern [No] button (41x18)
+    float bestBtnNoScore = -1.0f;
+    int bestBtnNoX = 0, bestBtnNoY = 0;
     for (int y = yStart; y <= yEnd - BTN_NO_H; y += 2) {
         for (int x = xStart; x <= xEnd - BTN_NO_W; x += 2) {
             const int N = BTN_NO_W * BTN_NO_H;
@@ -1089,130 +1288,263 @@ bool BotEngine::IsSecurityDialogVisible(POINT* pYesCenter, bool* pIsNonSecurity)
                 }
             }
             float score = dot / pStd;
-            if (score > bestNoScore) {
-                bestNoScore = score;
-                bestNoX = x;
-                bestNoY = y;
+            if (score > bestBtnNoScore) {
+                bestBtnNoScore = score;
+                bestBtnNoX = x;
+                bestBtnNoY = y;
             }
         }
     }
 
-    bool hasDialog = (bestYesScore >= 0.65f || bestNoScore >= 0.70f);
-    if (!hasDialog) {
+    // Refine Modern [No] button in +/-4 neighborhood (step = 1) to eliminate odd/even grid alignment loss
+    if (bestBtnNoScore >= 0.35f) {
+        int refStartX = (std::max)(xStart, bestBtnNoX - 4);
+        int refEndX   = (std::min)(xEnd - BTN_NO_W, bestBtnNoX + 4);
+        int refStartY = (std::max)(yStart, bestBtnNoY - 4);
+        int refEndY   = (std::min)(yEnd - BTN_NO_H, bestBtnNoY + 4);
+        for (int y = refStartY; y <= refEndY; y++) {
+            for (int x = refStartX; x <= refEndX; x++) {
+                const int N = BTN_NO_W * BTN_NO_H;
+                float pSum = 0.0f;
+                for (int ty = 0; ty < BTN_NO_H; ty++) {
+                    const uint8_t* row = &gray[(y + ty) * winW + x];
+                    for (int tx = 0; tx < BTN_NO_W; tx++) pSum += row[tx];
+                }
+                float pMean = pSum / N;
+                float pVar = 0.0f;
+                for (int ty = 0; ty < BTN_NO_H; ty++) {
+                    const uint8_t* row = &gray[(y + ty) * winW + x];
+                    for (int tx = 0; tx < BTN_NO_W; tx++) {
+                        float d = row[tx] - pMean;
+                        pVar += d * d;
+                    }
+                }
+                float pStd = std::sqrt(pVar);
+                if (pStd < 1.0f) continue;
+
+                float dot = 0.0f;
+                for (int ty = 0; ty < BTN_NO_H; ty++) {
+                    const uint8_t* row = &gray[(y + ty) * winW + x];
+                    for (int tx = 0; tx < BTN_NO_W; tx++) {
+                        dot += s_normBtnNo[ty][tx] * (row[tx] - pMean);
+                    }
+                }
+                float score = dot / pStd;
+                if (score > bestBtnNoScore) {
+                    bestBtnNoScore = score;
+                    bestBtnNoX = x;
+                    bestBtnNoY = y;
+                }
+            }
+        }
+    }
+
+    bool isModern = (bestBtnYesScore >= 0.70f || bestBtnNoScore >= 0.70f);
+    bool isClassic = false;
+    float bestClassicYesScore = -1.0f;
+    int bestClassicYesX = 0, bestClassicYesY = 0;
+
+    // 3. Scan for Classic [Yes] button only if Modern was NOT found
+    if (!isModern) {
+        for (int y = yStart; y <= yEnd - tmplH; y += 2) {
+            for (int x = xStart; x <= xEnd - tmplW; x += 2) {
+                const int N = tmplW * tmplH;
+                float pSum = 0.0f;
+                for (int ty = 0; ty < tmplH; ty++) {
+                    const uint8_t* row = &gray[(y + ty) * winW + x];
+                    for (int tx = 0; tx < tmplW; tx++) pSum += row[tx];
+                }
+                float pMean = pSum / N;
+                float pVar = 0.0f;
+                for (int ty = 0; ty < tmplH; ty++) {
+                    const uint8_t* row = &gray[(y + ty) * winW + x];
+                    for (int tx = 0; tx < tmplW; tx++) {
+                        float d = row[tx] - pMean;
+                        pVar += d * d;
+                    }
+                }
+                float pStd = std::sqrt(pVar);
+                if (pStd < 1.0f) continue;
+
+                float dot = 0.0f;
+                for (int ty = 0; ty < tmplH; ty++) {
+                    const uint8_t* row = &gray[(y + ty) * winW + x];
+                    for (int tx = 0; tx < tmplW; tx++) {
+                        float normVal = is1080p ? s_norm1080[ty][tx] : s_normTmpl[ty][tx];
+                        dot += normVal * (row[tx] - pMean);
+                    }
+                }
+                float score = dot / pStd;
+                if (score > bestClassicYesScore) {
+                    bestClassicYesScore = score;
+                    bestClassicYesX = x;
+                    bestClassicYesY = y;
+                }
+            }
+        }
+        isClassic = (bestClassicYesScore >= 0.75f);
+    }
+
+    if (!isModern && !isClassic) {
         return false;
     }
 
-    // Determine button center coordinates:
+    // Determine button center coordinates & dialog center
     int yesCenterX = 0, yesCenterY = 0;
     int noCenterX = 0, noCenterY = 0;
-    int buttonRefX = 0, buttonRefY = 0;
+    int dialogCenterX = 0, dialogCenterY = 0;
 
-    int noOffset = is1080p ? 100 : 76;
-
-    int btnOffset = is1080p ? 100 : 53;
-
-    // Check if bestYesX is actually the right button [No] by testing candidate at (bestYesX - btnOffset)
-    float leftScore = -1.0f;
-    int leftCandX = bestYesX - btnOffset;
-    if (leftCandX >= 0) {
-        const int N = tmplW * tmplH;
-        float pSum = 0.0f;
-        for (int ty = 0; ty < tmplH; ty++) {
-            const uint8_t* row = &gray[(bestYesY + ty) * winW + leftCandX];
-            for (int tx = 0; tx < tmplW; tx++) pSum += row[tx];
+    if (isModern) {
+        int btnOffset = is1080p ? 98 : 70;
+        if (bestBtnYesScore >= 0.70f && bestBtnNoScore >= 0.70f) {
+            yesCenterX = bestBtnYesX + BTN_YES_W / 2;
+            yesCenterY = bestBtnYesY + BTN_YES_H / 2;
+            noCenterX  = bestBtnNoX + BTN_NO_W / 2;
+            noCenterY  = bestBtnNoY + BTN_NO_H / 2;
+        } else if (bestBtnYesScore >= 0.70f) {
+            yesCenterX = bestBtnYesX + BTN_YES_W / 2;
+            yesCenterY = bestBtnYesY + BTN_YES_H / 2;
+            noCenterX  = yesCenterX + btnOffset;
+            noCenterY  = yesCenterY;
+        } else {
+            noCenterX  = bestBtnNoX + BTN_NO_W / 2;
+            noCenterY  = bestBtnNoY + BTN_NO_H / 2;
+            yesCenterX = noCenterX - btnOffset;
+            yesCenterY = noCenterY;
         }
-        float pMean = pSum / N;
-        float pVar = 0.0f;
-        for (int ty = 0; ty < tmplH; ty++) {
-            const uint8_t* row = &gray[(bestYesY + ty) * winW + leftCandX];
-            for (int tx = 0; tx < tmplW; tx++) {
-                float d = row[tx] - pMean;
-                pVar += d * d;
-            }
-        }
-        float pStd = std::sqrt(pVar);
-        if (pStd >= 1.0f) {
-            float dot = 0.0f;
-            for (int ty = 0; ty < tmplH; ty++) {
-                const uint8_t* row = &gray[(bestYesY + ty) * winW + leftCandX];
-                for (int tx = 0; tx < tmplW; tx++) {
-                    float normVal = is1080p ? s_norm1080[ty][tx] : s_normTmpl[ty][tx];
-                    dot += normVal * (row[tx] - pMean);
-                }
-            }
-            leftScore = dot / pStd;
-        }
-    }
-
-    if (leftScore >= 0.50f) {
-        // In Conquer Online prompt boxes, [Yes] is ALWAYS on the LEFT, [No] on the RIGHT
-        // The coarse peak was on [No], so the candidate to its left is [Yes]!
-        yesCenterX = leftCandX + tmplW / 2;
-        yesCenterY = bestYesY + tmplH / 2;
-        noCenterX  = bestYesX + tmplW / 2;
-        noCenterY  = bestYesY + tmplH / 2;
-        buttonRefX = noCenterX;
-        buttonRefY = noCenterY;
+        dialogCenterX = (yesCenterX + noCenterX) / 2;
+        dialogCenterY = (yesCenterY + noCenterY) / 2;
     } else {
-        yesCenterX = bestYesX + tmplW / 2;
-        yesCenterY = bestYesY + tmplH / 2;
-        noCenterX  = bestYesX + btnOffset + tmplW / 2;
-        noCenterY  = bestYesY + tmplH / 2;
-        buttonRefX = yesCenterX;
-        buttonRefY = yesCenterY;
+        yesCenterX = bestClassicYesX + tmplW / 2;
+        yesCenterY = bestClassicYesY + tmplH / 2;
+        int offset = is1080p ? 100 : 70;
+        noCenterX  = yesCenterX + offset;
+        noCenterY  = yesCenterY;
+        dialogCenterX = yesCenterX + offset / 2;
+        dialogCenterY = yesCenterY;
     }
 
     // ========================================================================
-    // 3. READ DIALOG TITLE ("يقرا ويفهم ان الكباتشا يس اي حاجه تانيه نو")
-    // Scan the title/header region above the buttons for the word "Security"
+    // 4. READ DIALOG TITLE ("يقرا ويفهم ان الكباتشا يس اي حاجه تانيه نو")
+    // Scan the title/header region above the buttons for:
+    // - "Security" (54x14)
+    // - "captcha" (46x14)
+    // - "CPs" (30x14)
     // ========================================================================
-    int roiY1 = (std::max)(0, buttonRefY - 120);
-    int roiY2 = (std::min)(winH - SECURITY_H, buttonRefY - 20);
-    int roiX1 = (std::max)(0, buttonRefX - 180);
-    int roiX2 = (std::min)(winW - SECURITY_W, buttonRefX + 180);
+    int roiY1 = (std::max)(0, dialogCenterY - 110);
+    int roiY2 = (std::min)(winH - 16, dialogCenterY - 25);
+    int roiX1 = (std::max)(0, dialogCenterX - 160);
+    int roiX2 = (std::min)(winW - 55, dialogCenterX + 160);
 
     float bestSecScore = -1.0f;
+    float bestCaptchaScore = -1.0f;
+    float bestCpsScore = -1.0f;
+
     for (int y = roiY1; y <= roiY2; y++) {
         for (int x = roiX1; x <= roiX2; x++) {
-            const int N = SECURITY_W * SECURITY_H;
-            float pSum = 0.0f;
-            for (int ty = 0; ty < SECURITY_H; ty++) {
-                const uint8_t* row = &gray[(y + ty) * winW + x];
-                for (int tx = 0; tx < SECURITY_W; tx++) pSum += row[tx];
-            }
-            float pMean = pSum / N;
-            float pVar = 0.0f;
-            for (int ty = 0; ty < SECURITY_H; ty++) {
-                const uint8_t* row = &gray[(y + ty) * winW + x];
-                for (int tx = 0; tx < SECURITY_W; tx++) {
-                    float d = row[tx] - pMean;
-                    pVar += d * d;
+            // A. Check "Security" (54x14)
+            if (x + SECURITY_W <= winW && y + SECURITY_H <= winH) {
+                const int N = SECURITY_W * SECURITY_H;
+                float pSum = 0.0f;
+                for (int ty = 0; ty < SECURITY_H; ty++) {
+                    const uint8_t* row = &gray[(y + ty) * winW + x];
+                    for (int tx = 0; tx < SECURITY_W; tx++) pSum += row[tx];
+                }
+                float pMean = pSum / N;
+                float pVar = 0.0f;
+                for (int ty = 0; ty < SECURITY_H; ty++) {
+                    const uint8_t* row = &gray[(y + ty) * winW + x];
+                    for (int tx = 0; tx < SECURITY_W; tx++) {
+                        float d = row[tx] - pMean;
+                        pVar += d * d;
+                    }
+                }
+                float pStd = std::sqrt(pVar);
+                if (pStd >= 1.0f) {
+                    float dot = 0.0f;
+                    for (int ty = 0; ty < SECURITY_H; ty++) {
+                        const uint8_t* row = &gray[(y + ty) * winW + x];
+                        for (int tx = 0; tx < SECURITY_W; tx++) {
+                            dot += s_normSecurity[ty][tx] * (row[tx] - pMean);
+                        }
+                    }
+                    float score = dot / pStd;
+                    if (score > bestSecScore) bestSecScore = score;
                 }
             }
-            float pStd = std::sqrt(pVar);
-            if (pStd < 1.0f) continue;
 
-            float dot = 0.0f;
-            for (int ty = 0; ty < SECURITY_H; ty++) {
-                const uint8_t* row = &gray[(y + ty) * winW + x];
-                for (int tx = 0; tx < SECURITY_W; tx++) {
-                    dot += s_normSecurity[ty][tx] * (row[tx] - pMean);
+            // B. Check "captcha" (46x14)
+            if (x + CAPTCHA_W <= winW && y + CAPTCHA_H <= winH) {
+                const int N = CAPTCHA_W * CAPTCHA_H;
+                float pSum = 0.0f;
+                for (int ty = 0; ty < CAPTCHA_H; ty++) {
+                    const uint8_t* row = &gray[(y + ty) * winW + x];
+                    for (int tx = 0; tx < CAPTCHA_W; tx++) pSum += row[tx];
+                }
+                float pMean = pSum / N;
+                float pVar = 0.0f;
+                for (int ty = 0; ty < CAPTCHA_H; ty++) {
+                    const uint8_t* row = &gray[(y + ty) * winW + x];
+                    for (int tx = 0; tx < CAPTCHA_W; tx++) {
+                        float d = row[tx] - pMean;
+                        pVar += d * d;
+                    }
+                }
+                float pStd = std::sqrt(pVar);
+                if (pStd >= 1.0f) {
+                    float dot = 0.0f;
+                    for (int ty = 0; ty < CAPTCHA_H; ty++) {
+                        const uint8_t* row = &gray[(y + ty) * winW + x];
+                        for (int tx = 0; tx < CAPTCHA_W; tx++) {
+                            dot += s_normCaptcha[ty][tx] * (row[tx] - pMean);
+                        }
+                    }
+                    float score = dot / pStd;
+                    if (score > bestCaptchaScore) bestCaptchaScore = score;
                 }
             }
-            float score = dot / pStd;
-            if (score > bestSecScore) {
-                bestSecScore = score;
+
+            // C. Check "CPs" (30x14)
+            if (x + CPS_W <= winW && y + CPS_H <= winH) {
+                const int N = CPS_W * CPS_H;
+                float pSum = 0.0f;
+                for (int ty = 0; ty < CPS_H; ty++) {
+                    const uint8_t* row = &gray[(y + ty) * winW + x];
+                    for (int tx = 0; tx < CPS_W; tx++) pSum += row[tx];
+                }
+                float pMean = pSum / N;
+                float pVar = 0.0f;
+                for (int ty = 0; ty < CPS_H; ty++) {
+                    const uint8_t* row = &gray[(y + ty) * winW + x];
+                    for (int tx = 0; tx < CPS_W; tx++) {
+                        float d = row[tx] - pMean;
+                        pVar += d * d;
+                    }
+                }
+                float pStd = std::sqrt(pVar);
+                if (pStd >= 1.0f) {
+                    float dot = 0.0f;
+                    for (int ty = 0; ty < CPS_H; ty++) {
+                        const uint8_t* row = &gray[(y + ty) * winW + x];
+                        for (int tx = 0; tx < CPS_W; tx++) {
+                            dot += s_normCps[ty][tx] * (row[tx] - pMean);
+                        }
+                    }
+                    float score = dot / pStd;
+                    if (score > bestCpsScore) bestCpsScore = score;
+                }
             }
         }
     }
 
-    // High confidence Security Check Captcha (handles small font on 576p/768p and 1080p):
-    // Real Security Captcha scores ~0.99, whereas CPs Reward Dialog (5 or 25 CPs) scores ~0.44.
-    bool isCaptcha = (bestSecScore >= 0.65f);
+    // High confidence discrimination:
+    // CPs Reward popup (5 CPs or 25 CPs) scores CPs ~ 1.00.
+    // Captcha dialog ("Solve Security Check" or "enter captcha") scores Sec ~ 1.00 or Cap ~ 1.00.
+    bool isCpsReward = (bestCpsScore >= 0.70f);
+    bool isCaptcha = (!isCpsReward && (bestSecScore >= 0.60f || bestCaptchaScore >= 0.65f));
 
     if (isCaptcha) {
-        // CONFIRMED CAPTCHA ("Solve Security Check To Unlock Drop"):
-        // User rule: "ان الكباتشا يس" -> Strictly Click [Yes]!
+        // CONFIRMED CAPTCHA -> Strictly Click [Yes]!
         if (pYesCenter) {
             pYesCenter->x = ptClient.x + yesCenterX;
             pYesCenter->y = ptClient.y + yesCenterY;
@@ -1220,12 +1552,11 @@ bool BotEngine::IsSecurityDialogVisible(POINT* pYesCenter, bool* pIsNonSecurity)
         if (pIsNonSecurity) {
             *pIsNonSecurity = false;
         }
-        printf("[+] [Dialog Discrimination] \"Security\" confirmed (NCC: %.2f)! Action: Click [Yes] @ (%d, %d)\n",
-               bestSecScore, yesCenterX, yesCenterY);
+        printf("[+] [Dialog Discrimination] CAPTCHA confirmed (Sec: %.2f, Cap: %.2f, CPs: %.2f)! Action: Click [Yes] @ (%d, %d)\n",
+               bestSecScore, bestCaptchaScore, bestCpsScore, yesCenterX, yesCenterY);
         return true;
     } else {
-        // CONFIRMED NON-SECURITY IN-GAME DIALOG (CPs Reward, NPC, Quest, etc.):
-        // User rule: "اي حاجه تانيه نو" -> Strictly Click [No]!
+        // CONFIRMED NON-SECURITY DIALOG (5 CPs / 25 CPs Reward, NPC, Quest) -> Strictly Click [No]!
         if (pYesCenter) {
             pYesCenter->x = ptClient.x + noCenterX;
             pYesCenter->y = ptClient.y + noCenterY;
@@ -1233,8 +1564,8 @@ bool BotEngine::IsSecurityDialogVisible(POINT* pYesCenter, bool* pIsNonSecurity)
         if (pIsNonSecurity) {
             *pIsNonSecurity = true;
         }
-        printf("[+] [Dialog Discrimination] Non-Security Dialog (Sec NCC: %.2f < 0.70)! Action: Click [No] @ (%d, %d)\n",
-               bestSecScore, noCenterX, noCenterY);
+        printf("[+] [Dialog Discrimination] NON-SECURITY Dialog (Sec: %.2f, Cap: %.2f, CPs: %.2f)! Action: Click [No] @ (%d, %d)\n",
+               bestSecScore, bestCaptchaScore, bestCpsScore, noCenterX, noCenterY);
         return true;
     }
 }
@@ -1242,11 +1573,11 @@ bool BotEngine::IsSecurityDialogVisible(POINT* pYesCenter, bool* pIsNonSecurity)
 bool BotEngine::CheckSecurityDialog(POINT& outYesClick) {
     if (!gameHwnd || !IsWindow(gameHwnd)) return false;
 
-    // Fast throttle check (180ms): eliminates heavy full-screen GDI BitBlt lag on every jump,
+    // Fast throttle check (400ms): eliminates heavy full-screen GDI BitBlt lag on every jump,
     // keeping the bot blazing fast 100% of the time just like right after captcha solve!
     static ULONGLONG s_lastDialogCheckTick = 0;
     ULONGLONG nowTick = GetTickCount64();
-    if (nowTick - s_lastDialogCheckTick < 180) {
+    if (nowTick - s_lastDialogCheckTick < 400) {
         return false;
     }
 
@@ -3792,10 +4123,10 @@ bool BotEngine::IsLoginScreenVisible() {
 bool BotEngine::CheckAndDismissEquipmentLock() {
     if (!gameHwnd || !IsWindow(gameHwnd)) return false;
 
-    // Fast throttle check (150ms)
+    // Fast throttle check (450ms)
     static ULONGLONG s_lastEquipLockTick = 0;
     ULONGLONG nowTick = GetTickCount64();
-    if (nowTick - s_lastEquipLockTick < 150) {
+    if (nowTick - s_lastEquipLockTick < 450) {
         return false;
     }
     s_lastEquipLockTick = nowTick;
@@ -4872,12 +5203,12 @@ void BotEngine::MainLoop() {
                 ClientToScreen(gameHwnd, &ptEscape);
                 Input::HoldCtrl(true);
                 Input::JumpClick(ptEscape.x, ptEscape.y);
-                if (!SafeSleep(35)) break;
+                if (!SafeSleep((int)Input::Rnd(20.0, 25.0))) break;
                 Input::AttackRightClick(ptEscape.x, ptEscape.y);
-                if (!SafeSleep(30)) break;
+                if (!SafeSleep((int)Input::Rnd(18.0, 24.0))) break;
                 POINT ptShot2 = { ptEscape.x + 35, ptEscape.y };
                 Input::AttackRightClick(ptShot2.x, ptShot2.y);
-                if (!SafeSleep(125)) break;
+                if (!SafeSleep((int)Input::Rnd(80.0, 90.0))) break;
                 continue;
             }
         } else {
@@ -4906,12 +5237,12 @@ void BotEngine::MainLoop() {
                 ClientToScreen(gameHwnd, &ptEscape);
                 Input::HoldCtrl(true);
                 Input::JumpClick(ptEscape.x, ptEscape.y);
-                if (!SafeSleep(35)) break;
+                if (!SafeSleep((int)Input::Rnd(20.0, 25.0))) break;
                 Input::AttackRightClick(ptEscape.x, ptEscape.y);
-                if (!SafeSleep(30)) break;
+                if (!SafeSleep((int)Input::Rnd(18.0, 24.0))) break;
                 POINT ptShot2 = { ptEscape.x + 35, ptEscape.y };
                 Input::AttackRightClick(ptShot2.x, ptShot2.y);
-                if (!SafeSleep(125)) break;
+                if (!SafeSleep((int)Input::Rnd(80.0, 90.0))) break;
                 continue;
             }
         }
@@ -4990,20 +5321,20 @@ void BotEngine::MainLoop() {
                 {    0, -130 }  // North
             };
 
-            if (!SafeSleep(22)) break;
+            if (!SafeSleep((int)Input::Rnd(20.0, 25.0))) break;
             POINT s1 = { centerX + SECTOR_DIRS[sectorAngle].x, centerY + SECTOR_DIRS[sectorAngle].y };
             ClientToScreen(gameHwnd, &s1);
             Input::AttackRightClick(s1.x, s1.y);
 
-            if (!SafeSleep(20)) break;
+            if (!SafeSleep((int)Input::Rnd(18.0, 24.0))) break;
             int nextSector = (sectorAngle + 1) % 6;
             POINT s2 = { centerX + SECTOR_DIRS[nextSector].x, centerY + SECTOR_DIRS[nextSector].y };
             ClientToScreen(gameHwnd, &s2);
             Input::AttackRightClick(s2.x, s2.y);
             sectorAngle = (sectorAngle + 2) % 6;
 
-            // Landing synchronization (85ms airtime: 22 + 20 + 85 = 127ms smooth chain)
-            if (!SafeSleep(85)) break;
+            // Landing synchronization (85ms airtime: chained smoothly with zero ground delay)
+            if (!SafeSleep((int)Input::Rnd(80.0, 90.0))) break;
             // Clear screen-coordinate vision blacklist on new jump position
             visionBlacklist.clear();
             continue;
@@ -5128,16 +5459,18 @@ void BotEngine::MainLoop() {
         Input::JumpClick(ptJump.x, ptJump.y);
         CheckAndHandleHotbarItems();
 
-        // 2. Flight airtime (220ms - matches natural Conquer Online jump arc)
-        if (!SafeSleep(220)) break;
+        // 2. Flight airtime (AutoHunt_v2 style fast jump arc: ~22ms takeoff)
+        if (!SafeSleep((int)Input::Rnd(20.0, 25.0))) break;
 
-        // 3. Ultra-fast mid-air / landing scatter attacks (AutoHunt_v2 style)
+        // 3. Ultra-fast mid-air scatter attacks (delivered at ~5 CPS with anti-ban random timing)
         Input::AttackRightClick(ptJump.x, ptJump.y);
-        if (!SafeSleep(35)) break;
+        if (!SafeSleep((int)Input::Rnd(18.0, 24.0))) break;
 
         POINT ptShot2 = { ptJump.x + 35, ptJump.y };
         Input::AttackRightClick(ptShot2.x, ptShot2.y);
-        if (!SafeSleep(30)) break;
+
+        // 4. Landing synchronization (85ms airtime: chained smoothly with zero ground delay)
+        if (!SafeSleep((int)Input::Rnd(80.0, 90.0))) break;
 
         // Clear screen-coordinate vision blacklist on new jump destination
         visionBlacklist.clear();

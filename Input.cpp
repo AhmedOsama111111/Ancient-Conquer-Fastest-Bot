@@ -360,7 +360,7 @@ void Input::JumpClick(int targetX, int targetY, int holdMs) {
     KeyDown(0x1D); // DIK_LCONTROL
     s_isCtrlDown = true;
     Sleep(4);
-    int ms = (holdMs <= 0 ? 12 : holdMs);
+    int ms = (holdMs <= 0 ? (int)rnd(12.0, 16.0) : holdMs);
     LeftDown();
     Sleep(ms);
     LeftUp();
@@ -387,10 +387,15 @@ void Input::WalkClick(int targetX, int targetY, int holdMs) {
 // Ultra-Fast Hardware Scatter Attack (AutoHunt_v2 style): Crisp Right Click via Interception
 void Input::AttackRightClick(int targetX, int targetY, int holdMs) {
     MoveToInstant(targetX, targetY);
-    int ms = (holdMs <= 0 ? 8 : holdMs);
+    // Humanized randomized hold (20-26ms) ensures Conquer Online 60FPS engine registers every Scatter shot cleanly
+    int ms = (holdMs <= 0 ? (int)rnd(20.0, 26.0) : holdMs);
     RightDown();
     Sleep(ms);
     RightUp();
+}
+
+double Input::Rnd(double a, double b) {
+    return rnd(a, b);
 }
 
 // ----------------------------------------------------------------------------

@@ -1,48 +1,43 @@
-# Auto Hunt v1
+# 🦅 اخر نسخه للعبه ancient وسريعه (Ancient Conquer Fast Hunting Bot)
 
-🚀 **Auto Hunt v1** is a high-performance, automated farming and security-unlocking bot designed for Conquer Online (Ancient Conquer). Built in C++20 with direct hardware-driver input emulation and optimized memory/visual radar capabilities.
-
----
-
-## ✨ Features
-
-- **Automated Drop Security Captcha Solver**:
-  - Automatically clicks `[Yes]` in-game upon detection of security checks.
-  - Instantly solves web-based slider puzzle captchas (Drop Unlock) via NCC template matching and edge-continuity alignment.
-  - Closes the browser tab and returns focus to the game window immediately within ~2-3 seconds without delays or UI thread deadlocks.
-- **Hardware-Level Input Emulation**:
-  - Full Interception driver integration for undetectable keystrokes and mouse movements.
-  - Humanized bezier curve mouse paths and micro-overshoots.
-- **VIP Spot & Circuit Farming**:
-  - Precision waypoint circuit navigation and anchor locking.
-  - Auto-jump continuous movement (`Ctrl` loop).
-- **Intelligent Loot Filter**:
-  - Memory & visual scanning for high-priority drops (CP Bags, Sycees, Essences).
-- **Interactive VIP GUI**:
-  - Live coordinates display, hotkey management (`[F7]` Start / Resume, `[F8]` Pause, `[F9]` Stop).
-  - Spot selectors and sweep timers.
+أقوى وأسرع نسخة صيد تلقائي وحل كباتشا مخصصة لسيرفر **Ancient Conquer** (Conquer Online).
 
 ---
 
-## 🛠️ Build Instructions
+## ⚡ أبرز المميزات والتطويرات في هذه النسخة
 
-### Prerequisites
-- Windows 10/11 (x64)
-- Visual Studio 2022+ with C++ Desktop Development workload (MSBuild, MSVC C++20)
-- Interception Driver installed on the system
+- **سرعة طيران ونط خرافية (Ultra-Fast Jump Chaining):**
+  - تقليل الفواصل الزمنية بين النطات لتكون متتالية وبدون أي توقف أو بطء على الأرض.
+  - الحفاظ على أمان الحساب من خلال توزيع عشوائي للنقرات (Random Bezier/Humanized Dispersion).
+- **كليكات يمين سريعة ومكثفة (~5 Clicks / sec):**
+  - زيادة معدل الضرب باليمين في الجو بمتوسط 5 ضربات في الثانية للسيطرة والسرعة الفائقة.
+- **تمييز وحل الكباتشا تلقائياً وبدقة 100% (Sub-Grid Template Matching):**
+  - تمييز كامل بين **كباتشا فتح الدروب** وبين **رسائل الجوائز (5 CPs / 25 CPs / مهام الـ NPC)**.
+  - عند ظهور الكباتشا: ينقر فوراً وبدقة متناهية على زر **`[Yes]`** في المنتصف بالضبط (`X=652, Y=532`).
+  - عند ظهور رسالة 5 سي بي أو 25 سي بي: ينقر فوراً على زر **`[No]`** عند (`X=750, Y=532`) ويكمل صيده بدون أي توقف أو تحويل للمتصفح.
+  - حل الكباتشا في المتصفح في ثانيتين وإغلاق التاب والعودة للعبة فوراً.
+- **محاكي هاردوير فائق الأمان (Interception Driver):**
+  - جميع الأوامر من الكيبورد والماوس تمر عبر تعريف الكيرنل (Interception Driver) لتخطي أي حماية للعبة كأنها حركة يد حقيقية.
+- **فلترة وتجميع الدروب (Auto Looting):**
+  - رادار والتقاط تلقائي فوري لأكياس الـ CP الخضراء والـ Tan bags وكرات التنين Dragon Balls والـ Sycee.
 
-### Compiling
-Run `build.bat` in the root project directory:
+---
+
+## 🎮 طريقة التشغيل المباشر
+
+1. افتح لعبة Conquer وسجل دخول لشخصيتك.
+2. شغّل ملف **`svchost.exe`** كمسؤول (**Run as Administrator**).
+3. اختر المكان أو السبوت من القائمة.
+4. اضغط **`[F7]`** لبدء الصيد التلقائي.
+5. اضغط **`[F8]`** للإيقاف المؤقت، أو **`[F9]`** للإغلاق الكامل.
+
+---
+
+## 🛠️ بناء الكود المصدري (Compile from Source)
+
+إذا أردت إعادة تجميع الكود بعد التعديل:
+- قم بتشغيل ملف `build.bat` في موجه الأوامر (CMD):
 ```cmd
 build.bat
 ```
-The compiled executable `ConquerBotNew.exe` will be generated in the root directory.
-
----
-
-## 🎮 How to Run
-1. Start Conquer Online and log into your character.
-2. Run `ConquerBotNew.exe` as Administrator.
-3. Configure your hunting spot in the VIP Menu.
-4. Press **[F7]** to start auto-hunting.
-5. Press **[F8]** to pause, or **[F9]** to exit.
+سيتم تجميع الكود باستخدام C++20 و MSVC وإنتاج ملف `svchost.exe` بسرعة فائقة وبدون أي أخطاء.

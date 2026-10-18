@@ -52,6 +52,8 @@ namespace Input {
     void SendCtrlW();
 
     // Humanized Log-Normal Timing Engine (from clicker_engine.py)
-    double GetNaturalDelay(double targetCps = 6.0);
+    double Rnd(double a, double b);
+    double GetNaturalDelay(double targetCps = 5.0);
     void PreciseSleep(double seconds);
 }
+
